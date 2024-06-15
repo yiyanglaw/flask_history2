@@ -1,11 +1,28 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Function to write text to the file when the application starts
+# Function to write initial text to the file when the application starts
 def write_initial_text():
     with open('Malware Detection.txt', 'a') as file:
         file.write('Initial text written by the Flask application\n')
+
+# Route to write any text to the file
+@app.route('/write/<text>', methods=['GET'])
+def write_text(text):
+    with open('Malware Detection.txt', 'a') as file:
+        file.write(text + '\n')
+    return jsonify({"message": f"Text '{text}' written to Malware Detection.txt"}), 200
+
+# Route to display the contents of the file
+@app.route('/display', methods=['GET'])
+def display_text():
+    try:
+        with open('Malware Detection.txt', 'r') as file:
+            content = file.read()
+        return jsonify({"content": content}), 200
+    except FileNotFoundError:
+        return jsonify({"error": "File not found"}), 404
 
 @app.route('/')
 def home():
